@@ -5,3 +5,4 @@ client/id_rsa.pub
 server/users.json
 server/msgs.db
 server/logs.txt
+.vscode/**

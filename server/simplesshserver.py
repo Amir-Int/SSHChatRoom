@@ -18,8 +18,7 @@ from twisted.python import components, log
 
 log.startLogging(sys.stderr)
 
-"""
-Example of running a custom protocol as a shell session over an SSH channel.
+"""Example of running a custom protocol as a shell session over an SSH channel.
 
 Warning! This implementation is here to help you understand how Conch SSH
 server works. You should not use this code in production.
@@ -134,9 +133,7 @@ PRIMES = {
 
 
 class ExampleAvatar(avatar.ConchUser):
-    """
-    The avatar is used to configure SSH services/sessions/subsystems for
-    an account.
+    """The avatar is used to configure SSH services/sessions/subsystems for an account.
 
     This account will use L{session.SSHSession} to handle a channel of
     type I{session}.
@@ -150,27 +147,25 @@ class ExampleAvatar(avatar.ConchUser):
 
 @implementer(portal.IRealm)
 class ExampleRealm:
-    """
+    """Responsible for meeting requirements of the Conch SSH server.
+    
     When using Twisted Cred, the pluggable authentication framework, the
     C{requestAvatar} method should return a L{avatar.ConchUser} instance
     as required by the Conch SSH server.
     """
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        """
-        See: L{portal.IRealm.requestAvatar}
+        """See: L{portal.IRealm.requestAvatar}
         """
         return interfaces[0], ExampleAvatar(avatarId), lambda: None
 
 
 class EchoProtocol(protocol.Protocol):
-    """
-    This is our protocol that we will run over the shell session.
+    """This is our protocol that we will run over the shell session.
     """
 
     def dataReceived(self, data):
-        """
-        Called when client send data over the shell session.
+        """Called when client send data over the shell session.
 
         Just echo the received data and and if Ctrl+C is received, close the
         session.
@@ -185,37 +180,35 @@ class EchoProtocol(protocol.Protocol):
 
 @implementer(session.ISession, session.ISessionSetEnv)
 class ExampleSession:
-    """
+    """Responsible for handling client requests.
+
     This selects what to do for each type of session which is requested by the
     client via the SSH channel of type I{session}.
     """
 
     def __init__(self, avatar):
-        """
+        """Constructor
+
         In this example the avatar argument is not used for session selection,
         but for example you can use it to limit I{shell} or I{exec} access
         only to specific accounts.
         """
 
     def getPty(self, term, windowSize, attrs):
-        """
-        We don't support pseudo-terminal sessions.
+        """We don't support pseudo-terminal sessions.
         """
 
     def setEnv(self, name, value):
-        """
-        We don't support setting environment variables.
+        """We don't support setting environment variables.
         """
 
     def execCommand(self, proto, cmd):
-        """
-        We don't support command execution sessions.
+        """We don't support command execution sessions.
         """
         raise Exception("not executing commands")
 
     def openShell(self, transport):
-        """
-        Use our protocol as shell session.
+        """Use our protocol as shell session.
         """
         protocol = EchoProtocol()
         # Connect the new protocol to the transport and the transport
@@ -236,8 +229,7 @@ components.registerAdapter(
 
 
 class ExampleFactory(factory.SSHFactory):
-    """
-    This is the entry point of our SSH server implementation.
+    """The entry point of our SSH server implementation.
 
     The SSH transport layer is implemented by L{SSHTransport} and is the
     protocol of this factory.
@@ -269,20 +261,17 @@ class ExampleFactory(factory.SSHFactory):
     # type RSA.
 
     def getPublicKeys(self):
-        """
-        See: L{factory.SSHFactory}
+        """See: L{factory.SSHFactory}
         """
         return {b"ssh-rsa": keys.Key.fromFile(SERVER_RSA_PUBLIC)}
 
     def getPrivateKeys(self):
-        """
-        See: L{factory.SSHFactory}
+        """See: L{factory.SSHFactory}
         """
         return {b"ssh-rsa": keys.Key.fromFile(SERVER_RSA_PRIVATE)}
 
     def getPrimes(self):
-        """
-        See: L{factory.SSHFactory}
+        """See: L{factory.SSHFactory}
         """
         return PRIMES
 
